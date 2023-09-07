@@ -16,6 +16,7 @@ def close_popup(wait):
 
 class OpenMessage:
     def __init__(self, master):
+        self.activity_error = None
         self.activity_button = None
         self.activity = None
         self.activity_entry = None
@@ -48,8 +49,7 @@ class OpenMessage:
         self.activity.grid(row=1, column=0)
         self.activity_entry.grid(row=1, column=1)
         self.activity_button = Button(self.leave_frame, text="Enter", fg="red",
-                                      command=lambda: self.hide_leave_frame(
-                                          self.stay("how long would you like to do this for?(minutes)")))
+                                      command=lambda: self.activity_checker())
         self.activity_button.grid(row=2, columnspan=2)
 
     def stay(self, t="Great, how much longer would you like to stay on this page?(minutes)"):
@@ -59,15 +59,23 @@ class OpenMessage:
                                        state="readonly",
                                        values=[5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]
                                        )
-        task_button = Button(self.leave_frame, text="Enter", fg="red", command=lambda: self.checker())
+        task_button = Button(self.leave_frame, text="Enter", fg="red", command=lambda: self.time_checker())
         self.time_entry.grid(row=1, column=0)
         task_button.grid(row=1, column=1)
 
-    def checker(self):
+    def time_checker(self):
         if self.time_entry.get() == '':
-            Label(self.leave_frame, text="no time entered! try again").pack()
+            Label(self.leave_frame, text="no time entered! try again").grid(row=2)
         else:
             self.goodbye(1, int(self.time_entry.get()))
+
+    def activity_checker(self):
+        if self.activity_entry.get() == '' and self.activity_error is None:
+            self.activity_error = Label(self.leave_frame, text="no activity entered! try again")
+            self.activity_error.grid(row=3)
+        elif self.activity_entry.get() != '':
+            t = "how long would you like to " + self.activity_entry.get() + " for?(minutes)"
+            self.hide_leave_frame(self.stay(t))
 
     def goodbye(self, buffer=1500, wait=15):
         self.leave_frame.after(buffer, lambda: self.master.withdraw())
@@ -79,6 +87,8 @@ class OpenMessage:
         self.activity_entry.grid_forget()
         self.activity_button.grid_forget()
         self.close_webpage.grid_forget()
+        if self.activity_error is not None:
+            self.activity_error.grid_forget()
         return function
 
     def hide_main_frame(self, function):
