@@ -1,5 +1,4 @@
 from tkinter import *
-
 root = Tk()
 root.title('Reminder Raccoon')
 root.geometry("400x100")
@@ -26,11 +25,13 @@ class OpenMessage:
         self.leaveFrame = Frame(self.master)
         self.leaveFrame.pack()
         Label(self.leaveFrame, text="Close this page and get to work!!").pack()
+        self.leaveFrame.after(2000, lambda: self.master.destroy())
 
     def stay(self):
         self.hide_main_frame()
         self.leaveFrame.pack()
         Label(self.leaveFrame, text="Great, keep it up!").pack()
+        self.leaveFrame.after(2000, lambda: self.master.destroy())
 
     def hide_main_frame(self):
         self.mainFrame.pack_forget()
