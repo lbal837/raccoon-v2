@@ -1,7 +1,15 @@
 from tkinter import *
+import time
+
 root = Tk()
 root.title('Reminder Raccoon')
 root.geometry("400x100")
+
+
+def close_popup():
+    time.sleep(3)  # waits 3 seconds, irl should b 15 minutes
+    root.deiconify()
+    run_app()
 
 
 class OpenMessage:
@@ -25,18 +33,26 @@ class OpenMessage:
         self.leaveFrame = Frame(self.master)
         self.leaveFrame.pack()
         Label(self.leaveFrame, text="Close this page and get to work!!").pack()
-        self.leaveFrame.after(2000, lambda: self.master.destroy())
+        self.goodbye()
 
     def stay(self):
         self.hide_main_frame()
         self.leaveFrame.pack()
         Label(self.leaveFrame, text="Great, keep it up!").pack()
-        self.leaveFrame.after(2000, lambda: self.master.destroy())
+        self.goodbye()
+
+    def goodbye(self):
+        self.leaveFrame.after(1500, lambda: self.master.withdraw())
+        self.leaveFrame.after(1500, lambda: self.leaveFrame.pack_forget())
+        self.leaveFrame.after(1500, lambda: close_popup())
 
     def hide_main_frame(self):
         self.mainFrame.pack_forget()
 
 
-e = OpenMessage(root)
+def run_app():
+    OpenMessage(root)
+    root.mainloop()
 
-root.mainloop()
+
+run_app()
