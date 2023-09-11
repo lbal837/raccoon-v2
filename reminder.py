@@ -7,9 +7,9 @@ root.title('Reminder Raccoon')
 root.geometry("400x100")
 
 
-def close_popup(wait):
-    print("I am waiting " + str(wait) + " minutes")
-    time.sleep(wait)  # waits "wait" minutes
+def close_popup(wait, activity="stay on this webpage"):
+    print("I am waiting " + str(wait) + " minutes while you " + str(activity))
+    time.sleep(wait*60)  # waits "wait" minutes
     root.deiconify()
     run_app()
 
@@ -80,7 +80,11 @@ class OpenMessage:
     def goodbye(self, buffer=1500, wait=15):
         self.leave_frame.after(buffer, lambda: self.master.withdraw())
         self.leave_frame.after(buffer, lambda: self.leave_frame.pack_forget())
-        self.leave_frame.after(buffer, lambda: close_popup(wait))
+        if self.activity_entry is not None:
+            self.leave_frame.after(buffer, lambda: close_popup(wait, self.activity_entry.get()))
+        else:
+            self.leave_frame.after(buffer, lambda: close_popup(wait))
+
 
     def hide_leave_frame(self, function):
         self.activity.grid_forget()
