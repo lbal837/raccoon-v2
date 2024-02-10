@@ -16,6 +16,13 @@ def close_popup(wait, activity="stay on this webpage"):
 
 class OpenMessage:
     def __init__(self, master):
+        self.button2 = None
+        self.button1 = None
+        self.stay_here = None
+        self.distracted_label = None
+        self.feel_button = None
+        self.feel_entry = None
+        self.feel_label = None
         self.activity_error = None
         self.activity_button = None
         self.activity = None
@@ -26,13 +33,29 @@ class OpenMessage:
         self.master = master
         self.main_frame = Frame(self.master)
         self.leave_frame = Frame(self.master)
+        self.distracted_frame = Frame(self.master)
+        self.feelings()
+
+    def feelings(self):
         self.main_frame.pack()
-        self.distracted = Label(self.main_frame, text="Distracted?")  # see if you can label without name
-        self.stay_here = Label(self.main_frame,
+        self.feel_label = Label(self.main_frame, text="How do you feel right now?")
+        self.feel_entry = Entry(self.main_frame)
+        self.feel_label.grid(row=1, column=0)
+        self.feel_entry.grid(row=1, column=1)
+        self.feel_button = Button(self.main_frame, text="Enter", fg="red",
+                                  command=lambda: self.hide_main_frame())
+        self.feel_button.grid(row=2, columnspan=2)
+
+    def distracted(self):
+        feel_text = "you feel " + self.feel_entry.get()
+        self.distracted_label = Label(self.distracted_frame, text=feel_text)  # see if you can label without name
+        self.stay_here = Label(self.distracted_frame,
                                text="Do you want to stay on this webpage?")  # see if you can label without name
-        self.button1 = Button(self.main_frame, text="Yes", fg="red", command=lambda: self.hide_main_frame(self.stay()))
-        self.button2 = Button(self.main_frame, text="No", fg="blue", command=lambda: self.hide_main_frame(self.leave()))
-        self.distracted.grid(row=0, columnspan=2)
+        self.button1 = Button(self.distracted_frame, text="Yes", fg="red",
+                              command=lambda: self.hide_distracted_frame(self.stay()))
+        self.button2 = Button(self.distracted_frame, text="No", fg="blue",
+                              command=lambda: self.hide_distracted_frame(self.leave()))
+        self.distracted_label.grid(row=0, columnspan=2)
         self.stay_here.grid(row=1, columnspan=2)
         self.button1.grid(row=2)
         self.button2.grid(row=2, column=1)
@@ -85,7 +108,6 @@ class OpenMessage:
         else:
             self.leave_frame.after(buffer, lambda: close_popup(wait))
 
-
     def hide_leave_frame(self, function):
         self.activity.grid_forget()
         self.activity_entry.grid_forget()
@@ -95,10 +117,15 @@ class OpenMessage:
             self.activity_error.grid_forget()
         return function
 
-    def hide_main_frame(self, function):
-        self.main_frame.pack_forget()
+    def hide_distracted_frame(self, function):
+        self.distracted_frame.pack_forget()
         self.leave_frame.pack()
         return function
+
+    def hide_main_frame(self):
+        self.main_frame.pack_forget()
+        self.distracted_frame.pack()
+        return self.distracted()
 
 
 def run_app():
