@@ -7,15 +7,16 @@ root.title('Reminder Raccoon')
 root.geometry("400x100")
 
 
-def close_popup(wait, activity="stay on this webpage"):
-    print("I am waiting " + str(wait) + " minutes while you " + str(activity))
-    time.sleep(wait*60)  # waits "wait" minutes
+def close_popup():
+    # print("I am waiting " + str(wait) + " minutes while you " + str(activity))
+    # waits "wait" minutes
     root.deiconify()
     run_app()
 
 
 class OpenMessage:
     def __init__(self, master):
+        self.timer_label = None
         self.button2 = None
         self.button1 = None
         self.stay_here = None
@@ -34,6 +35,9 @@ class OpenMessage:
         self.main_frame = Frame(self.master)
         self.leave_frame = Frame(self.master)
         self.distracted_frame = Frame(self.master)
+        self.timer_frame = Frame(self.master)
+        self.minutes = 00
+        self.secs = 00
         self.feelings()
 
     def feelings(self):
@@ -80,7 +84,7 @@ class OpenMessage:
                                              columnspan=2)
         self.time_entry = ttk.Combobox(self.leave_frame,
                                        state="readonly",
-                                       values=[5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]
+                                       values=[1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]
                                        )
         task_button = Button(self.leave_frame, text="Enter", fg="red", command=lambda: self.time_checker())
         self.time_entry.grid(row=1, column=0)
@@ -90,7 +94,8 @@ class OpenMessage:
         if self.time_entry.get() == '':
             Label(self.leave_frame, text="no time entered! try again").grid(row=2)
         else:
-            self.goodbye(1, int(self.time_entry.get()))
+            self.minutes = int(self.time_entry.get())
+            self.goodbye(1)
 
     def activity_checker(self):
         if self.activity_entry.get() == '' and self.activity_error is None:
@@ -100,13 +105,32 @@ class OpenMessage:
             t = "how long would you like to " + self.activity_entry.get() + " for?(minutes)"
             self.hide_leave_frame(self.stay(t))
 
-    def goodbye(self, buffer=1500, wait=15):
-        self.leave_frame.after(buffer, lambda: self.master.withdraw())
+    def goodbye(self, buffer=1500):
+        # self.leave_frame.after(buffer, lambda: self.master.withdraw())
         self.leave_frame.after(buffer, lambda: self.leave_frame.pack_forget())
-        if self.activity_entry is not None:
-            self.leave_frame.after(buffer, lambda: close_popup(wait, self.activity_entry.get()))
-        else:
-            self.leave_frame.after(buffer, lambda: close_popup(wait))
+        # if self.activity_entry is not None:
+        # self.leave_frame.after(buffer, lambda: close_popup(wait, self.activity_entry.get()))
+        # else:
+        # self.leave_frame.after(buffer, lambda: close_popup(wait))
+        self.leave_frame.after(buffer, lambda: self.timer_display())
+
+    def timer_display(self):
+        self.timer_frame.pack()
+        self.timer_label = Label(self.timer_frame, text=f"Time Left: {self.minutes}: {self.secs}")
+        self.timer_label.pack()
+        self.countdown()
+
+    def countdown(self):
+        count = self.minutes * 60
+        while count > 0:
+            self.minutes, self.secs = divmod(count, 60)
+            self.timer_label.config(text=f"Time Left: {self.minutes}: {self.secs}")
+            self.timer_label.update()
+            time.sleep(1)
+            count -= 1
+        self.timer_frame.after(1000, lambda: self.master.withdraw())
+        self.timer_frame.after(1000, lambda: self.timer_frame.pack_forget())
+        self.timer_frame.after(1000, lambda: close_popup())
 
     def hide_leave_frame(self, function):
         self.activity.grid_forget()
