@@ -14,6 +14,10 @@ def close_popup():
     run_app()
 
 
+def stay_on_top():
+    root.wm_attributes("-topmost", 1) # app will stay on top of other windows
+
+
 class OpenMessage:
     def __init__(self, master):
         self.timer_label = None
@@ -154,6 +158,7 @@ class OpenMessage:
 
 def run_app():
     OpenMessage(root)
+    stay_on_top()
     root.mainloop()
 
 
