@@ -15,11 +15,12 @@ def close_popup():
 
 
 def stay_on_top():
-    root.wm_attributes("-topmost", 1) # app will stay on top of other windows
+    root.wm_attributes("-topmost", 1)  # app will stay on top of other windows
 
 
 class OpenMessage:
     def __init__(self, master):
+        self.activity_for_timer = None
         self.timer_label = None
         self.button2 = None
         self.button1 = None
@@ -120,7 +121,11 @@ class OpenMessage:
 
     def timer_display(self):
         self.timer_frame.pack()
-        self.timer_label = Label(self.timer_frame, text=f"Time Left: {self.minutes}: {self.secs}")
+        if self.activity_entry is None:
+            self.activity_for_timer = "stay on this webpage"
+        else:
+            self.activity_for_timer = self.activity_entry.get()
+        self.timer_label = Label(self.timer_frame, text=f"I am waiting {self.minutes}m: {self.secs}s while you {self.activity_for_timer}")
         self.timer_label.pack()
         self.countdown()
 
@@ -128,7 +133,7 @@ class OpenMessage:
         count = self.minutes * 60
         while count > 0:
             self.minutes, self.secs = divmod(count, 60)
-            self.timer_label.config(text=f"Time Left: {self.minutes}: {self.secs}")
+            self.timer_label.config(text=f"I am waiting {self.minutes}m: {self.secs}s while you {self.activity_for_timer}")
             self.timer_label.update()
             time.sleep(1)
             count -= 1
