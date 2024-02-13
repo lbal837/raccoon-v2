@@ -1,10 +1,8 @@
 from tkinter import *
-import time
 from tkinter import ttk
 
 root = Tk()
 root.title('Reminder Raccoon')
-root.geometry("400x100")
 
 
 def close_popup():
@@ -120,25 +118,32 @@ class OpenMessage:
         self.leave_frame.after(buffer, lambda: self.timer_display())
 
     def timer_display(self):
+
+        #self.master.geometry("+600+250")
+        root.geometry("50x50")
+
         self.timer_frame.pack()
         if self.activity_entry is None:
             self.activity_for_timer = "stay on this webpage"
         else:
             self.activity_for_timer = self.activity_entry.get()
-        self.timer_label = Label(self.timer_frame, text=f"I am waiting {self.minutes}m: {self.secs}s while you {self.activity_for_timer}")
+        self.timer_label = Label(self.timer_frame, text=f"{self.minutes}m: {self.secs}s")
         self.timer_label.pack()
         self.countdown()
 
     def countdown(self):
         count = self.minutes * 60
+        count_init = self.minutes * 60
         while count > 0:
             self.minutes, self.secs = divmod(count, 60)
-            self.timer_label.config(text=f"I am waiting {self.minutes}m: {self.secs}s while you {self.activity_for_timer}")
-            self.timer_label.update()
-            time.sleep(1)
+            self.timer_label.config(text=f"{self.minutes}m: {self.secs}s")
+            self.timer_label.after(1000, self.timer_label.update())
+            # time.sleep(1)
             count -= 1
-        self.timer_frame.after(1000, lambda: self.master.withdraw())
-        self.timer_frame.after(1000, lambda: self.timer_frame.pack_forget())
+            if count == count_init - 2:
+                root.iconify()
+        self.timer_frame.after(950, lambda: self.master.withdraw())
+        self.timer_frame.after(950, lambda: self.timer_frame.pack_forget())
         self.timer_frame.after(1000, lambda: close_popup())
 
     def hide_leave_frame(self, function):
@@ -162,6 +167,8 @@ class OpenMessage:
 
 
 def run_app():
+    root.geometry("400x100")
+    root.geometry("+450+250")
     OpenMessage(root)
     stay_on_top()
     root.mainloop()
