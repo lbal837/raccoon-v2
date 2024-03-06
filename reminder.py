@@ -3,11 +3,18 @@ from tkinter import ttk
 
 root = Tk()
 root.title('Reminder Raccoon')
+minutes_working = 0
+bad_emotions = ["bad", "grr", "anxious", "sad", "angry"]
 
 
-def close_popup():
+def close_popup(mins):
     # print("I am waiting " + str(wait) + " minutes while you " + str(activity))
     # waits "wait" minutes
+    global minutes_working
+    if mins == 0:
+        minutes_working = 0
+    else:
+        minutes_working += mins
     root.deiconify()
     run_app()
 
@@ -18,6 +25,17 @@ def stay_on_top():
 
 class OpenMessage:
     def __init__(self, master):
+        self.continue_working_button = None
+        self.something_else_button = None
+        self.something_else_label = None
+        self.break_reason_label = None
+        self.breathe_button = None
+        self.tea_button = None
+        self.water_button = None
+        self.outside_button = None
+        self.walk_button = None
+        self.break_label = None
+        self.feel_error = None
         self.activity_for_timer = None
         self.timer_label = None
         self.button2 = None
@@ -34,11 +52,14 @@ class OpenMessage:
         self.webpage = IntVar(value=0)
         self.close_webpage = None
         self.time_entry = None
+        self.break_true = False
         self.master = master
+        self.minutes_working = minutes_working
         self.main_frame = Frame(self.master)
         self.leave_frame = Frame(self.master)
         self.distracted_frame = Frame(self.master)
         self.timer_frame = Frame(self.master)
+        self.break_frame = Frame(self.master)
         self.minutes = 00
         self.secs = 00
         self.feelings()
@@ -50,7 +71,7 @@ class OpenMessage:
         self.feel_label.grid(row=1, column=0)
         self.feel_entry.grid(row=1, column=1)
         self.feel_button = Button(self.main_frame, text="Enter", fg="red",
-                                  command=lambda: self.hide_main_frame())
+                                  command=lambda: self.feels_checker())
         self.feel_button.grid(row=2, columnspan=2)
 
     def distracted(self):
@@ -66,6 +87,33 @@ class OpenMessage:
         self.stay_here.grid(row=1, columnspan=2)
         self.button1.grid(row=2)
         self.button2.grid(row=2, column=1)
+
+    def take_a_break(self, break_text):
+        self.break_frame.pack()
+        root.geometry("400x200")
+        self.break_reason_label = Label(self.break_frame, text=break_text)
+        self.break_label = Label(self.break_frame, text="I suggest a 5 minute break, here are some ideas!")
+        self.walk_button = Button(self.break_frame, text="Taking a walk", fg="green", command=lambda: self.hide_break_frame())
+        self.outside_button = Button(self.break_frame, text="Going outside", fg="pink", command=lambda: self.hide_break_frame())
+        self.water_button = Button(self.break_frame, text="Drinking some water", fg="blue", command=lambda: self.hide_break_frame())
+        self.tea_button = Button(self.break_frame, text="Making tea", fg="brown", command=lambda: self.hide_break_frame())
+        self.breathe_button = Button(self.break_frame, text="Breathing", fg="purple", command=lambda: self.hide_break_frame())
+        self.something_else_label = Label(self.break_frame, text="I want to do my own thing -->", padx=0)
+        self.something_else_button = Button(self.break_frame, text="just  break", command=lambda: self.hide_break_frame(), padx=0)
+        self.continue_working_button = Button(self.break_frame, text="keep working", command= lambda: self.hide_break_but_continue())
+        self.break_reason_label.grid(row=1, columnspan=3)
+        self.break_label.grid(row=2, columnspan=3)
+        self.walk_button.grid(row=3, column=1)
+        self.outside_button.grid(row=3, column=3)
+        self.water_button.grid(row=4, column=2)
+        self.tea_button.grid(row=5, column=1)
+        self.breathe_button.grid(row=5, column=3)
+        #self.something_else_label.grid(row=6, column=2)
+        self.something_else_button.grid(row=6, column=2)
+        self.continue_working_button.grid(row=7, column=3)
+
+
+
 
     def leave(self):
         t = "Close the webpage you are on"
@@ -93,6 +141,13 @@ class OpenMessage:
         self.time_entry.grid(row=1, column=0)
         task_button.grid(row=1, column=1)
 
+    def feels_checker(self):
+        if self.feel_entry.get() == '' and self.feel_error is None:
+            self.feel_error = Label(self.main_frame, text="No feeling entered! try again")
+            self.feel_error.grid(row=3)
+        elif self.feel_entry.get() != '':
+            self.hide_main_frame()
+
     def time_checker(self):
         if self.time_entry.get() == '':
             Label(self.leave_frame, text="no time entered! try again").grid(row=2)
@@ -119,7 +174,7 @@ class OpenMessage:
 
     def timer_display(self):
 
-        #self.master.geometry("+600+250")
+        # self.master.geometry("+600+250")
         root.geometry("50x50")
 
         self.timer_frame.pack()
@@ -144,7 +199,10 @@ class OpenMessage:
                 root.iconify()
         self.timer_frame.after(950, lambda: self.master.withdraw())
         self.timer_frame.after(950, lambda: self.timer_frame.pack_forget())
-        self.timer_frame.after(1000, lambda: close_popup())
+        if self.break_true:
+            self.timer_frame.after(1000, lambda: close_popup(0))
+        else:
+            self.timer_frame.after(1000, lambda: close_popup(count_init / 60))
 
     def hide_leave_frame(self, function):
         self.activity.grid_forget()
@@ -161,9 +219,26 @@ class OpenMessage:
         return function
 
     def hide_main_frame(self):
+
         self.main_frame.pack_forget()
+        if self.minutes_working >= 180:
+            return self.take_a_break("You have been on your computer for 3 hours or more!")
+        else:
+            self.distracted_frame.pack()
+            return self.distracted()
+
+    def hide_break_frame(self):
+        self.break_frame.pack_forget()
+        self.minutes = 5
+        self.break_true = True
+        return self.timer_display()
+
+    def hide_break_but_continue(self):
+        self.break_frame.pack_forget()
         self.distracted_frame.pack()
+        root.geometry("400x100")
         return self.distracted()
+
 
 
 def run_app():
