@@ -68,10 +68,10 @@ class OpenMessage:
         self.main_frame.pack()
         self.feel_label = Label(self.main_frame, text="How do you feel right now?")
         self.feel_entry = Entry(self.main_frame)
-        self.feel_label.grid(row=1, column=0)
-        self.feel_entry.grid(row=1, column=1)
         self.feel_button = Button(self.main_frame, text="Enter", fg="red",
                                   command=lambda: self.feels_checker())
+        self.feel_label.grid(row=1, column=0)
+        self.feel_entry.grid(row=1, column=1)
         self.feel_button.grid(row=2, columnspan=2)
 
     def distracted(self):
