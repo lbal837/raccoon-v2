@@ -108,7 +108,7 @@ class OpenMessage:
         self.water_button.grid(row=4, column=2)
         self.tea_button.grid(row=5, column=1)
         self.breathe_button.grid(row=5, column=3)
-        #self.something_else_label.grid(row=6, column=2)
+        #  self.something_else_label.grid(row=6, column=2)
         self.something_else_button.grid(row=6, column=2)
         self.continue_working_button.grid(row=7, column=3)
 
