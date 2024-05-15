@@ -4,6 +4,7 @@ from tkinter import ttk
 root = Tk()
 root.title('Reminder Raccoon')
 minutes_working = 0
+total_minutes_working = 0
 bad_emotions = ["bad", "grr", "anxious", "sad", "angry"]
 
 
@@ -25,6 +26,7 @@ def stay_on_top():
 
 class OpenMessage:
     def __init__(self, master):
+        self.break_button = None
         self.continue_working_button = None
         self.something_else_button = None
         self.something_else_label = None
@@ -83,24 +85,34 @@ class OpenMessage:
                               command=lambda: self.hide_distracted_frame(self.stay()))
         self.button2 = Button(self.distracted_frame, text="No", fg="blue",
                               command=lambda: self.hide_distracted_frame(self.leave()))
+        self.break_button = Button(self.distracted_frame, text="I need a break", fg="green",
+                                   command=lambda: self.hide_break_frame(self.distracted_frame))
         self.distracted_label.grid(row=0, columnspan=2)
         self.stay_here.grid(row=1, columnspan=2)
         self.button1.grid(row=2)
         self.button2.grid(row=2, column=1)
+        self.break_button.grid(row=3, column=0)
 
     def take_a_break(self, break_text):
         self.break_frame.pack()
         root.geometry("400x200")
         self.break_reason_label = Label(self.break_frame, text=break_text)
         self.break_label = Label(self.break_frame, text="I suggest a 5 minute break, here are some ideas!")
-        self.walk_button = Button(self.break_frame, text="Taking a walk", fg="green", command=lambda: self.hide_break_frame())
-        self.outside_button = Button(self.break_frame, text="Going outside", fg="pink", command=lambda: self.hide_break_frame())
-        self.water_button = Button(self.break_frame, text="Drinking some water", fg="blue", command=lambda: self.hide_break_frame())
-        self.tea_button = Button(self.break_frame, text="Making tea", fg="brown", command=lambda: self.hide_break_frame())
-        self.breathe_button = Button(self.break_frame, text="Breathing", fg="purple", command=lambda: self.hide_break_frame())
+        self.walk_button = Button(self.break_frame, text="Taking a walk", fg="green",
+                                  command=lambda: self.hide_break_frame(self.break_frame))
+        self.outside_button = Button(self.break_frame, text="Going outside", fg="pink",
+                                     command=lambda: self.hide_break_frame(self.break_frame))
+        self.water_button = Button(self.break_frame, text="Drinking some water", fg="blue",
+                                   command=lambda: self.hide_break_frame(self.break_frame))
+        self.tea_button = Button(self.break_frame, text="Making tea", fg="brown",
+                                 command=lambda: self.hide_break_frame(self.break_frame))
+        self.breathe_button = Button(self.break_frame, text="Breathing", fg="purple",
+                                     command=lambda: self.hide_break_frame(self.break_frame))
         self.something_else_label = Label(self.break_frame, text="I want to do my own thing -->", padx=0)
-        self.something_else_button = Button(self.break_frame, text="just  break", command=lambda: self.hide_break_frame(), padx=0)
-        self.continue_working_button = Button(self.break_frame, text="keep working", command= lambda: self.hide_break_but_continue())
+        self.something_else_button = Button(self.break_frame, text="just  break",
+                                            command=lambda: self.hide_break_frame(self.break_frame), padx=0)
+        self.continue_working_button = Button(self.break_frame, text="keep working",
+                                              command=lambda: self.hide_break_but_continue())
         self.break_reason_label.grid(row=1, columnspan=3)
         self.break_label.grid(row=2, columnspan=3)
         self.walk_button.grid(row=3, column=1)
@@ -111,9 +123,6 @@ class OpenMessage:
         #  self.something_else_label.grid(row=6, column=2)
         self.something_else_button.grid(row=6, column=2)
         self.continue_working_button.grid(row=7, column=3)
-
-
-
 
     def leave(self):
         t = "Close the webpage you are on"
@@ -175,14 +184,18 @@ class OpenMessage:
     def timer_display(self):
 
         # self.master.geometry("+600+250")
-        root.geometry("50x50")
+        # root.geometry("50x50")
 
         self.timer_frame.pack()
         if self.activity_entry is None:
-            self.activity_for_timer = "stay on this webpage"
+            if self.break_true:
+                self.activity_for_timer = "take a break"
+            else:
+                self.activity_for_timer = "stay on this webpage"
         else:
             self.activity_for_timer = self.activity_entry.get()
-        self.timer_label = Label(self.timer_frame, text=f"{self.minutes}m: {self.secs}s")
+        self.timer_label = Label(
+            self.timer_frame, text=f"I am waiting {self.minutes}m: {self.secs}s for you to {self.activity_for_timer}")
         self.timer_label.pack()
         self.countdown()
 
@@ -191,7 +204,8 @@ class OpenMessage:
         count_init = self.minutes * 60
         while count > 0:
             self.minutes, self.secs = divmod(count, 60)
-            self.timer_label.config(text=f"{self.minutes}m: {self.secs}s")
+            self.timer_label.config(
+                text=f"I am waiting {self.minutes}m: {self.secs}s for you to {self.activity_for_timer}")
             self.timer_label.after(1000, self.timer_label.update())
             # time.sleep(1)
             count -= 1
@@ -221,14 +235,14 @@ class OpenMessage:
     def hide_main_frame(self):
 
         self.main_frame.pack_forget()
-        if self.minutes_working >= 180:
-            return self.take_a_break("You have been on your computer for 3 hours or more!")
+        if self.minutes_working >= 60:
+            return self.take_a_break("You have been on your computer for 1 hour or more!")
         else:
             self.distracted_frame.pack()
             return self.distracted()
 
-    def hide_break_frame(self):
-        self.break_frame.pack_forget()
+    def hide_break_frame(self, frame):
+        frame.pack_forget()
         self.minutes = 5
         self.break_true = True
         return self.timer_display()
@@ -238,7 +252,6 @@ class OpenMessage:
         self.distracted_frame.pack()
         root.geometry("400x100")
         return self.distracted()
-
 
 
 def run_app():
