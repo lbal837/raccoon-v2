@@ -75,9 +75,6 @@ class OpenMessage:
     def write_to_file(self):
         time = datetime.today().strftime('%I:%M%p')
         new = [time, self.feel_entry.get(), self.activity_for_timer, self.minutes]
-        with open(self.csv_file_path, newline="") as fd:
-            print(fd.read())
-
         with open(self.csv_file_path, mode='a', newline="") as fd:
             appender = csv.writer(fd)
             appender.writerow(new)

@@ -21,3 +21,14 @@ however rename the original executable
 ```commandline
 pyinstaller --noconsole --onefile reminder.py
 ```
+
+if the above doesn't work try:
+idk what is going on
+```commandline
+py -m PyInstaller -F --noconsole reminder.py
+```
+
+and if the install aint working try:
+```commandline
+ py -m pip install pyinstaller
+```
