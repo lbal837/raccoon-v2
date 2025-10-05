@@ -73,7 +73,8 @@ class OpenMessage:
         pass
 
     def write_to_file(self):
-        new = [self.activity_for_timer, self.minutes, self.feel_entry.get()]
+        time = datetime.today().strftime('%I:%M%p')
+        new = [time, self.feel_entry.get(), self.activity_for_timer, self.minutes]
         with open(self.csv_file_path, newline="") as fd:
             print(fd.read())
 
@@ -278,7 +279,7 @@ def run_app():
     root.mainloop()
 
 
-data = ['Activity', 'Minutes', "Feeling"]
+data = ['Time', 'Feeling', 'Activity', 'Minutes']
 with open(csv_file_path, mode='w', newline='') as file:
     # Create a csv.writer object
     writer = csv.writer(file)
