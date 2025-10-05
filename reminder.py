@@ -1,11 +1,13 @@
 from tkinter import *
 from tkinter import ttk
+import csv
+from datetime import datetime
 
 root = Tk()
 root.title('Reminder Raccoon')
 minutes_working = 0
 total_minutes_working = 0
-bad_emotions = ["bad", "grr", "anxious", "sad", "angry"]
+csv_file_path = datetime.today().strftime('%d-%m-%Y-%H-%M-%S') + ".csv"
 
 
 def close_popup(mins):
@@ -57,6 +59,7 @@ class OpenMessage:
         self.break_true = False
         self.master = master
         self.minutes_working = minutes_working
+        self.csv_file_path = csv_file_path
         self.main_frame = Frame(self.master)
         self.leave_frame = Frame(self.master)
         self.distracted_frame = Frame(self.master)
@@ -65,6 +68,18 @@ class OpenMessage:
         self.minutes = 00
         self.secs = 00
         self.feelings()
+
+    def end_session(self):
+        pass
+
+    def write_to_file(self):
+        new = [self.activity_for_timer, self.minutes, self.feel_entry.get()]
+        with open(self.csv_file_path, newline="") as fd:
+            print(fd.read())
+
+        with open(self.csv_file_path, mode='a', newline="") as fd:
+            appender = csv.writer(fd)
+            appender.writerow(new)
 
     def feelings(self):
         self.main_frame.pack()
@@ -197,6 +212,7 @@ class OpenMessage:
         self.timer_label = Label(
             self.timer_frame, text=f"I am waiting {self.minutes}m: {self.secs}s for you to {self.activity_for_timer}")
         self.timer_label.pack()
+        self.write_to_file()
         self.countdown()
 
     def countdown(self):
@@ -262,4 +278,10 @@ def run_app():
     root.mainloop()
 
 
+data = ['Activity', 'Minutes', "Feeling"]
+with open(csv_file_path, mode='w', newline='') as file:
+    # Create a csv.writer object
+    writer = csv.writer(file)
+    # Write data to the CSV file
+    writer.writerow(data)
 run_app()
