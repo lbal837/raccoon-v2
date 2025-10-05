@@ -1,10 +1,23 @@
 # raccoon-v2
-create an exe file : 
+clone the code :)
+
+create an exe file :
+
 First time:
-in console write:
+
+in console write the following:
+```commandline
 pip install pyinstaller
-navigate to the appropriate folder using cd then,
+```
+navigate to the appropriate folder using cd
+
+```commandline
 pyinstaller reminder.py
 pyinstaller --noconsole --onefile reminder.py
-then all subsiquint times just write the below in the command prompt to create the command file, however rename the original executable
+```
+
+then all subsequent times just write the below in the command prompt to create the command file,
+however rename the original executable
+```commandline
 pyinstaller --noconsole --onefile reminder.py
+```
