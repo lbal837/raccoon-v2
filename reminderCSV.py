@@ -220,7 +220,7 @@ class OpenMessage:
             self.minutes, self.secs = divmod(count, 60)
             self.timer_label.config(
                 text=f"I am waiting {self.minutes}m: {self.secs}s for you to {self.activity_for_timer}")
-            self.timer_label.after(1, self.timer_label.update())
+            self.timer_label.after(1000, self.timer_label.update())
             # time.sleep(1)
             count -= 1
             if count == count_init - 2:
